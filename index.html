@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NSD Executive Dashboard — Bommasandra AMJ 2025-26</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --bg-base:#0d0d14;--bg-surface:#13131f;--bg-card:#1a1a2e;--bg-input:#16162a;--bg-nav:#0f0f1c;
+  --ap:#7c6ff7;--as:#a78bfa;--ag:rgba(124,111,247,.15);
+  --apk:#e879f9;--ac:#22d3ee;--agr:#4ade80;--ao:#fb923c;--ar:#f87171;--ay:#fbbf24;
+  --tp:#f1f1ff;--ts:#9898b8;--tm:#5a5a7a;
+  --b:rgba(124,111,247,.12);--bh:rgba(124,111,247,.35);--bc:rgba(255,255,255,.05);
+  --c1:#7c6ff7;--c2:#e879f9;--c3:#22d3ee;--c4:#4ade80;--c5:#fb923c;--c6:#fbbf24;--c7:#a78bfa;--c8:#34d399;
+  --gp:linear-gradient(135deg,#7c6ff7,#e879f9);
+  --gh:linear-gradient(135deg,rgba(124,111,247,.12),rgba(232,121,249,.06));
+  --sc:0 4px 24px rgba(0,0,0,.4),0 0 0 1px var(--bc);
+  --sg:0 0 32px rgba(124,111,247,.2);
+  --sw:220px;--th:62px;
+  --rsm:6px;--rmd:10px;--rlg:16px;--rxl:22px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px;scroll-behavior:smooth}
+body{background:var(--bg-base);color:var(--tp);font-family:'Inter',sans-serif;font-size:.9rem;line-height:1.5;min-height:100vh;overflow-x:hidden}
+a{color:var(--as);text-decoration:none}
+button{cursor:pointer;font-family:inherit;border:none;outline:none}
+input,select{font-family:inherit}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg-base)}
+::-webkit-scrollbar-thumb{background:var(--bg-card);border-radius:999px}
+::-webkit-scrollbar-thumb:hover{background:var(--ap)}
+
+#app{display:flex;min-height:100vh}
+
+/* ── SIDEBAR ── */
+#sidebar{width:var(--sw);min-height:100vh;background:var(--bg-nav);border-right:1px solid var(--b);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform .3s}
+.slogo{padding:18px 18px 14px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:10px}
+.slogo-ico{width:34px;height:34px;background:var(--gp);border-radius:var(--rmd);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.slogo-txt{font-weight:800;font-size:.9rem;color:var(--tp)}
+.slogo-sub{font-size:.65rem;color:var(--tm);margin-top:1px}
+.nsec{font-size:.62rem;font-weight:700;color:var(--tm);letter-spacing:.1em;text-transform:uppercase;padding:14px 18px 5px}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 18px;color:var(--ts);font-size:.8rem;font-weight:500;cursor:pointer;border-left:3px solid transparent;transition:all .15s;user-select:none}
+.ni:hover{background:var(--ag);color:var(--tp)}
+.ni.active{background:var(--ag);color:var(--as);border-left-color:var(--ap)}
+.ni-ico{font-size:.95rem;width:18px;text-align:center;flex-shrink:0}
+.sfoot{margin-top:auto;padding:14px 18px;border-top:1px solid var(--b)}
+.sf-t{font-size:.65rem;color:var(--tm)}
+.sf-v{font-size:.63rem;color:var(--ap);font-weight:700;margin-top:2px}
+
+/* ── MAIN ── */
+#main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* ── TOPBAR ── */
+#topbar{height:var(--th);background:var(--bg-surface);border-bottom:1px solid var(--b);display:flex;align-items:center;padding:0 22px;gap:14px;position:sticky;top:0;z-index:90}
+.tb-ttl{font-size:.95rem;font-weight:800;color:var(--tp);flex:1}
+.tb-ttl span{color:var(--as)}
+.tb-meta{font-size:.7rem;color:var(--tm);display:flex;align-items:center;gap:6px}
+.ldot{width:7px;height:7px;border-radius:50%;background:var(--agr);box-shadow:0 0 6px var(--agr);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.tbtn{background:var(--bg-card);border:1px solid var(--b);color:var(--ts);padding:6px 13px;border-radius:var(--rmd);font-size:.76rem;font-weight:500;display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
+.tbtn:hover{border-color:var(--ap);color:var(--as);background:var(--ag)}
+.tbtn.p{background:var(--ap);border-color:var(--ap);color:#fff}
+.tbtn.p:hover{opacity:.85}
+
+/* ── CONTENT ── */
+#content{padding:22px;flex:1}
+
+/* ── UPLOAD MODAL ── */
+.umodal{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(5px);z-index:500;display:none;align-items:center;justify-content:center}
+.umodal.show{display:flex}
+.ucard{background:var(--bg-card);border:2px dashed var(--bh);border-radius:var(--rxl);padding:48px 42px;text-align:center;max-width:540px;width:90%;position:relative;overflow:hidden;transition:all .25s}
+.ucard::before{content:'';position:absolute;inset:0;background:var(--gh);opacity:0;transition:opacity .25s}
+.ucard:hover,.ucard.dov{border-color:var(--ap);box-shadow:var(--sg)}
+.ucard:hover::before,.ucard.dov::before{opacity:1}
+.u-ico{font-size:2.6rem;margin-bottom:13px;position:relative;z-index:1}
+.u-ttl{font-size:1.2rem;font-weight:800;color:var(--tp);margin-bottom:7px;position:relative;z-index:1}
+.u-sub{font-size:.79rem;color:var(--ts);margin-bottom:24px;position:relative;z-index:1;line-height:1.6}
+.u-sub strong{color:var(--as)}
+.u-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
+.ubtn{background:var(--gp);color:#fff;padding:10px 24px;border-radius:var(--rmd);font-size:.85rem;font-weight:700;display:flex;align-items:center;gap:8px;transition:all .2s;box-shadow:0 4px 16px rgba(124,111,247,.3)}
+.ubtn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,111,247,.4)}
+.ubtn.sec{background:var(--bg-surface);color:var(--ts);border:1px solid var(--b);box-shadow:none}
+.ubtn.sec:hover{border-color:var(--ap);color:var(--as);background:var(--ag)}
+.ubtn.fw{width:100%;justify-content:center}
+.fmts{display:flex;gap:7px;justify-content:center;margin-top:16px;flex-wrap:wrap;position:relative;z-index:1}
+.fmt{background:var(--bg-input);border:1px solid var(--b);color:var(--tm);font-size:.65rem;font-weight:700;padding:3px 10px;border-radius:999px;letter-spacing:.05em}
+.flist{width:100%;max-width:540px;display:flex;flex-direction:column;gap:7px;position:relative;z-index:1;margin-top:14px}
+.fi{background:var(--bg-card);border:1px solid var(--b);border-radius:var(--rmd);padding:9px 13px;display:flex;align-items:center;gap:10px}
+.fi-ico{font-size:1.1rem}
+.fi-inf{flex:1}
+.fi-nm{font-size:.8rem;font-weight:600;color:var(--tp)}
+.fi-mt{font-size:.67rem;color:var(--tm);margin-top:1px}
+.fi-pr{height:3px;background:var(--bg-input);border-radius:999px;margin-top:4px;overflow:hidden}
+.fi-pb{height:100%;background:var(--gp);border-radius:999px}
+.fi-rm{background:none;border:none;color:var(--tm);padding:4px;cursor:pointer;transition:color .15s;font-size:.9rem}
+.fi-rm:hover{color:var(--ar)}
+.uclose{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tm);font-size:1.2rem;cursor:pointer;z-index:10}
+
+/* ── PAGE HEADER ── */
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:14px;flex-wrap:wrap}
+.ph h1{font-size:1.2rem;font-weight:800;color:var(--tp);letter-spacing:-.02em}
+.ph p{font-size:.74rem;color:var(--ts);margin-top:3px}
+.ph-a{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* ── KPI GRID ── */
+.kg{display:grid;grid-template-columns:repeat(auto-fill,minmax(162px,1fr));gap:12px;margin-bottom:20px}
+.kc{background:var(--bg-card);border:1px solid var(--bc);border-radius:var(--rlg);padding:16px 16px 13px;position:relative;overflow:hidden;transition:all .2s;cursor:default}
+.kc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--kclr,var(--ap));border-radius:0 0 var(--rlg) var(--rlg);opacity:0;transition:opacity .2s}
+.kc:hover{border-color:var(--bh);transform:translateY(-2px);box-shadow:var(--sc)}
+.kc:hover::after{opacity:1}
+.kl{font-size:.63rem;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px;display:flex;align-items:center;gap:5px}
+.kd{width:6px;height:6px;border-radius:50%;background:var(--kclr,var(--ap));flex-shrink:0}
+.kv{font-size:1.45rem;font-weight:800;color:var(--tp);letter-spacing:-.03em;font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:7px}
+.ks{font-size:.67rem;color:var(--tm);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.kb{padding:2px 7px;border-radius:999px;font-size:.62rem;font-weight:700}
+.up{background:rgba(74,222,128,.12);color:var(--agr)}
+.dn{background:rgba(248,113,113,.12);color:var(--ar)}
+.neu{background:rgba(124,111,247,.12);color:var(--as)}
+.ki{position:absolute;top:13px;right:13px;font-size:1.25rem;opacity:.2}
+
+/* ── CARD ── */
+.card{background:var(--bg-card);border:1px solid var(--bc);border-radius:var(--rlg);overflow:hidden;transition:border-color .2s}
+.card:hover{border-color:var(--b)}
+.ch{padding:13px 17px 11px;border-bottom:1px solid var(--bc);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ct{font-size:.84rem;font-weight:700;color:var(--tp);display:flex;align-items:center;gap:7px}
+.cbdg{font-size:.65rem;padding:2px 8px;border-radius:999px;background:var(--ag);color:var(--as);font-weight:600}
+.ca{display:flex;gap:5px}
+.cbtn{background:var(--bg-surface);border:1px solid var(--b);color:var(--tm);padding:4px 9px;border-radius:var(--rsm);font-size:.7rem;transition:all .15s}
+.cbtn:hover{border-color:var(--ap);color:var(--as)}
+.cb{padding:15px 17px}
+.cb.p0{padding:0}
+
+/* ── GRIDS ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+.g12{display:grid;grid-template-columns:1fr 2fr;gap:14px}
+.mb14{margin-bottom:14px}.mb20{margin-bottom:20px}.fw{width:100%}
+
+/* ── TABLE ── */
+.tw{overflow-x:auto}
+table.dt{width:100%;border-collapse:collapse;font-size:.78rem}
+.dt th{background:var(--bg-surface);color:var(--tm);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:9px 14px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--b)}
+.dt td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.03);color:var(--ts);white-space:nowrap}
+.dt tr:last-child td{border-bottom:none}
+.dt tr:hover td{background:rgba(124,111,247,.04)}
+.tn{color:var(--tp)!important;font-weight:600}
+.tv{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--tp)!important}
+.r1 td{background:rgba(124,111,247,.07)!important}
+.r2 td{background:rgba(124,111,247,.04)!important}
+.r3 td{background:rgba(124,111,247,.02)!important}
+.rb{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-size:.7rem;font-weight:700}
+.rb.gld{background:rgba(251,191,36,.15);color:var(--ay)}
+.rb.slv{background:rgba(152,152,184,.15);color:#9898b8}
+.rb.brz{background:rgba(251,146,60,.15);color:var(--ao)}
+.rb.nrm{background:var(--bg-surface);color:var(--tm)}
+
+/* ── BARS ── */
+.bw{background:var(--bg-surface);border-radius:999px;height:5px;overflow:hidden;min-width:70px}
+.bf{height:100%;border-radius:999px;transition:width .6s}
+.bv{background:var(--gp)}.bg2{background:var(--agr)}.bo2{background:var(--ao)}.bc2{background:var(--ac)}
+
+/* ── PILLS ── */
+.pill{display:inline-flex;align-items:center;gap:3px;padding:2px 9px;border-radius:999px;font-size:.66rem;font-weight:600}
+.pg{background:rgba(74,222,128,.12);color:var(--agr)}
+.pr{background:rgba(248,113,113,.12);color:var(--ar)}
+.pv{background:var(--ag);color:var(--as)}
+.po{background:rgba(251,146,60,.12);color:var(--ao)}
+.pc{background:rgba(34,211,238,.12);color:var(--ac)}
+.py{background:rgba(251,191,36,.12);color:var(--ay)}
+
+/* ── TABS ── */
+.tabbar{display:flex;gap:3px;background:var(--bg-surface);padding:3px;border-radius:var(--rmd);border:1px solid var(--b);width:fit-content;flex-wrap:wrap}
+.tab{padding:5px 14px;border-radius:var(--rsm);font-size:.76rem;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s}
+.tab:hover{color:var(--ts)}
+.tab.active{background:var(--ap);color:#fff;box-shadow:0 2px 8px rgba(124,111,247,.3)}
+
+/* ── CHART ── */
+.cw{position:relative;width:100%}
+.cw canvas{display:block}
+
+/* ── INSIGHTS ── */
+.ig{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.ii{background:var(--bg-surface);border:1px solid var(--bc);border-radius:var(--rmd);padding:12px 14px;display:flex;gap:10px;align-items:flex-start}
+.ii-ico{font-size:1.2rem;flex-shrink:0;margin-top:1px}
+.ii-t strong{display:block;font-size:.78rem;font-weight:700;color:var(--tp);margin-bottom:3px}
+.ii-t span{font-size:.72rem;color:var(--ts)}
+
+/* ── FILTERS ── */
+.fr{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.fsel,.finp{background:var(--bg-card);border:1px solid var(--b);color:var(--ts);padding:6px 11px;border-radius:var(--rmd);font-size:.76rem;transition:border-color .15s}
+.fsel{appearance:none;cursor:pointer;min-width:120px}
+.fsel:focus,.finp:focus{border-color:var(--ap);color:var(--tp);outline:none}
+
+/* ── DIVIDER ── */
+.sdiv{display:flex;align-items:center;gap:10px;margin:20px 0 16px}
+.sdiv-t{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--tm);white-space:nowrap}
+.sdiv-l{flex:1;height:1px;background:var(--bc)}
+
+/* ── VINTAGE ── */
+.vb{background:var(--bg-surface);border:1px solid var(--bc);border-radius:var(--rmd);padding:14px;text-align:center}
+.vb-l{font-size:.65rem;color:var(--tm);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:7px}
+.vb-v{font-size:1.3rem;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--tp)}
+.vb-s{font-size:.68rem;color:var(--tm);margin-top:3px}
+
+/* ── DONUT LEGEND ── */
+.dl{display:flex;flex-direction:column;gap:7px;padding:0 2px}
+.dl-i{display:flex;align-items:center;gap:7px;font-size:.74rem}
+.dl-d{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dl-l{color:var(--ts);flex:1}
+.dl-v{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--tp);font-size:.72rem}
+
+/* ── TOAST ── */
+#toasts{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:7px}
+.toast{background:var(--bg-card);border:1px solid var(--b);border-radius:var(--rmd);padding:11px 14px;font-size:.78rem;color:var(--tp);display:flex;align-items:center;gap:9px;min-width:200px;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.6);animation:tin .3s ease}
+.toast.ts{border-left:3px solid var(--agr)}
+.toast.te{border-left:3px solid var(--ar)}
+.toast.ti{border-left:3px solid var(--ap)}
+@keyframes tin{from{transform:translateX(16px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ── LOADING ── */
+.lov{position:fixed;inset:0;background:rgba(13,13,20,.88);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:14px}
+.spin{width:38px;height:38px;border:3px solid var(--b);border-top-color:var(--ap);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  #sidebar{transform:translateX(-100%)}
+  #sidebar.open{transform:translateX(0)}
+  #main{margin-left:0}
+  .g2,.g3,.g4,.g21,.g12{grid-template-columns:1fr}
+  .kg{grid-template-columns:repeat(2,1fr)}
+}
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div id="app">
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="slogo">
+    <div class="slogo-ico">⚡</div>
+    <div>
+      <div class="slogo-txt">NSD Dashboard</div>
+      <div class="slogo-sub">Bommasandra · AMJ 2025–26</div>
+    </div>
+  </div>
+  <div class="nsec">Overview</div>
+  <div class="ni active" data-tab="summary"><span class="ni-ico">📊</span> Executive Summary</div>
+  <div class="ni" data-tab="sales"><span class="ni-ico">📈</span> Sales Performance</div>
+  <div class="nsec">People</div>
+  <div class="ni" data-tab="manager"><span class="ni-ico">👔</span> Manager Dashboard</div>
+  <div class="ni" data-tab="exec"><span class="ni-ico">👨‍💼</span> Executive Rankings</div>
+  <div class="ni" data-tab="team"><span class="ni-ico">🗂️</span> Team Mapping</div>
+  <div class="nsec">Analytics</div>
+  <div class="ni" data-tab="location"><span class="ni-ico">📍</span> Location Dashboard</div>
+  <div class="ni" data-tab="hl"><span class="ni-ico">🎯</span> HL Conversion</div>
+  <div class="ni" data-tab="meetings"><span class="ni-ico">🤝</span> Meeting Analytics</div>
+  <div class="ni" data-tab="vintage"><span class="ni-ico">📅</span> Vintage Analysis</div>
+  <div class="ni" data-tab="kpi"><span class="ni-ico">📐</span> KPI Guide</div>
+  <div class="sfoot">
+    <div class="sf-t" id="sf-data">AMJ 2025–26 · 1,242 Sales</div>
+    <div class="sf-v">v2.1 · Single File</div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="main">
+  <header id="topbar">
+    <div class="tb-ttl">NSD <span>Executive Dashboard</span></div>
+    <div class="tb-meta" id="tb-meta"><div class="ldot"></div> Bommasandra · ₹2.53Cr · 1,242 Sales</div>
+    <button class="tbtn" onclick="D.exp()">⬇️ Export CSV</button>
+    <button class="tbtn p" onclick="D.showU()">📂 Load Files</button>
+  </header>
+  <div id="content">
+    <!-- UPLOAD MODAL -->
+    <div class="umodal" id="umodal">
+      <div class="ucard" id="udrop">
+        <button class="uclose" onclick="D.hideU()">✕</button>
+        <div class="u-ico">📂</div>
+        <div class="u-ttl">Upload Data Files</div>
+        <div class="u-sub">Drag &amp; drop <strong>multiple files</strong> — all sheets auto-detected.<br>
+          <strong>.xlsb · .xlsx · .xls · .csv</strong> — saves automatically to browser</div>
+        <div class="u-btns">
+          <button class="ubtn" id="ubrowse">📁 Browse Files</button>
+          <button class="ubtn sec" onclick="D.hideU()">Cancel</button>
+        </div>
+        <div class="fmts">
+          <span class="fmt">XLSB</span><span class="fmt">XLSX</span><span class="fmt">XLS</span>
+          <span class="fmt">CSV</span><span class="fmt">Multi-file ✓</span><span class="fmt">Auto-Save ✓</span>
+        </div>
+        <div class="flist" id="flist"></div>
+        <div id="runwrap" style="display:none;margin-top:12px">
+          <button class="ubtn fw" onclick="D.process()">⚡ Build Dashboard from Files</button>
+        </div>
+      </div>
+    </div>
+    <!-- DASHBOARD -->
+    <div id="dz"></div>
+  </div>
+</div>
+</div>
+<div id="toasts"></div>
+
+<script>
+const LIVE = {"meta":{"totalSales":1242,"totalRevenue":25267028,"totalHC":161,"activeHC":33,"totalMeetings":27423,"hlAssigned":3245,"hlSold":515,"hlConvOverall":15.9,"topManager":"Pranav Kumar","topExec":"C Varun Gouda","bestLocation":"Bommasandra","worstLocation":"Caretech Support Services"},"managers":[{"name":"Pranav Kumar","sales":405,"amount":8362812,"hc":32,"hl":0},{"name":"Osama Abdulla","sales":287,"amount":5649380,"hc":25,"hl":0},{"name":"Vijay Girennavar","sales":163,"amount":3382116,"hc":27,"hl":0},{"name":"Bikash Chandra Naik","sales":107,"amount":1805695,"hc":16,"hl":0},{"name":"Somen Chowdhury","sales":80,"amount":1929060,"hc":13,"hl":0},{"name":"Sripathi Mahesh Babu","sales":59,"amount":1137520,"hc":14,"hl":0},{"name":"Muddukrishna S M","sales":52,"amount":1296820,"hc":14,"hl":0},{"name":"Firoj Hussain","sales":50,"amount":1059345,"hc":11,"hl":0},{"name":"Douzi Umar Ali Khan","sales":22,"amount":302080,"hc":5,"hl":0},{"name":"Nandeesh C","sales":11,"amount":214760,"hc":8,"hl":3245},{"name":"Sunpreet Singh","sales":3,"amount":47200,"hc":2,"hl":0},{"name":"Lavel Veevan D Silva","sales":3,"amount":80240,"hc":3,"hl":0}],"locations":[{"name":"Bommasandra","sales":404,"amount":8358092,"hc":32},{"name":"Central Market","sales":367,"amount":7578440,"hc":27},{"name":"J P Nagar","sales":147,"amount":2927816,"hc":12},{"name":"Professional Pal Bangalore","sales":127,"amount":2152615,"hc":14},{"name":"Excel Coworks Bangalore","sales":75,"amount":2226955,"hc":14},{"name":"Marconix Sales","sales":43,"amount":604750,"hc":8},{"name":"Bommanahalli","sales":43,"amount":797680,"hc":8},{"name":"Khannba Enterprises","sales":35,"amount":582920,"hc":9},{"name":"Caretech Support Services","sales":1,"amount":37760,"hc":1}],"execs":[{"name":"C Varun Gouda","sales":53,"amount":1207680,"hl":123,"hlConv":25.2,"meetings":457,"tl":"Sunpreet Singh","manager":"Sripathi Mahesh Babu","location":"Bommanahalli"},{"name":"Selvin Samuel","sales":47,"amount":1031080,"hl":128,"hlConv":14.1,"meetings":437,"tl":"Somen Chowdhury","manager":"Osama Abdulla","location":"Central Market"},{"name":"S Suhail","sales":44,"amount":637200,"hl":138,"hlConv":15.2,"meetings":483,"tl":"Somen Chowdhury","manager":"Osama Abdulla","location":"Central Market"},{"name":"Raaghu B V","sales":40,"amount":1116460,"hl":134,"hlConv":19.4,"meetings":477,"tl":"Somen Chowdhury","manager":"Osama Abdulla","location":"Central Market"},{"name":"Syed Kaif","sales":39,"amount":778800,"hl":114,"hlConv":14.9,"meetings":424,"tl":"Somen Chowdhury","manager":"Osama Abdulla","location":"Central Market"},{"name":"Yashassu N S","sales":33,"amount":783520,"hl":74,"hlConv":18.9,"meetings":501,"tl":"Mahadevaswamy M","manager":"Pranav Kumar","location":"Bommasandra"},{"name":"Chandan M K","sales":32,"amount":826295,"hl":2,"hlConv":0.0,"meetings":661,"tl":"Bikash Chandra Naik","manager":"Bikash Chandra Naik","location":"Professional Pal Bangalore"},{"name":"Jyoti Prakash Sahu","sales":30,"amount":691480,"hl":73,"hlConv":24.7,"meetings":238,"tl":"Dulal Chandra Rooj","manager":"Douzi Umar Ali Khan","location":"J P Nagar"},{"name":"Bhagavantraya","sales":30,"amount":636560,"hl":70,"hlConv":20.0,"meetings":314,"tl":"Manoj C Y","manager":"Pranav Kumar","location":"Bommasandra"},{"name":"Deepak R","sales":30,"amount":571120,"hl":63,"hlConv":20.6,"meetings":382,"tl":"Manoj C Y","manager":"Pranav Kumar","location":"Bommasandra"},{"name":"Md Meraj","sales":29,"amount":533360,"hl":75,"hlConv":9.3,"meetings":287,"tl":"Dulal Chandra Rooj","manager":"Douzi Umar Ali Khan","location":"J P Nagar"},{"name":"Hemantha M","sales":28,"amount":456800,"hl":100,"hlConv":12.0,"meetings":408,"tl":"Mahadevaswamy M","manager":"Pranav Kumar","location":"Bommasandra"},{"name":"Anand Naik D","sales":27,"amount":471620,"hl":67,"hlConv":16.4,"meetings":318,"tl":"Mahadevaswamy M","manager":"Pranav Kumar","location":"Bommasandra"},{"name":"Sambit Kumar Das","sales":27,"amount":505580,"hl":92,"hlConv":18.5,"meetings":392,"tl":"Sandeep Kumar","manager":"Osama Abdulla","location":"Central Market"},{"name":"Jampanna R","sales":26,"amount":552240,"hl":73,"hlConv":9.6,"meetings":403,"tl":"Sunpreet Singh","manager":"Sripathi Mahesh Babu","location":"Bommanahalli"},{"name":"Ravi Pandey","sales":24,"amount":509760,"hl":67,"hlConv":20.9,"meetings":322,"tl":"Sandeep Kumar","manager":"Osama Abdulla","location":"Central Market"},{"name":"Muniraju R","sales":24,"amount":443680,"hl":44,"hlConv":20.5,"meetings":283,"tl":"Sandeep Kumar","manager":"Osama Abdulla","location":"Central Market"},{"name":"Chandan Kumar B V","sales":23,"amount":471056,"hl":70,"hlConv":15.7,"meetings":274,"tl":"Dulal Chandra Rooj","manager":"Douzi Umar Ali Khan","location":"J P Nagar"},{"name":"Babu R C","sales":23,"amount":538080,"hl":49,"hlConv":10.2,"meetings":403,"tl":"Mahadevaswamy M","manager":"Pranav Kumar","location":"Bommasandra"},{"name":"Sunil Kumar K S","sales":22,"amount":500320,"hl":74,"hlConv":10.8,"meetings":381,"tl":"Suresh Dash","manager":"Osama Abdulla","location":"Central Market"},{"name":"Ullas Gadageppa Doni","sales":21,"amount":297360,"hl":71,"hlConv":8.5,"meetings":455,"tl":"Mahadevaswamy M","manager":"Pranav Kumar","location":"Bommasandra"},{"name":"Hemanth Kumar M","sales":20,"amount":280840,"hl":14,"hlConv":7.1,"meetings":451,"tl":"Bikash Chandra Naik","manager":"Bikash Chandra Naik","location":"Professional Pal Bangalore"},{"name":"Valluru Mohan Reddy","sales":20,"amount":391760,"hl":28,"hlConv":35.7,"meetings":645,"tl":"Somen Chowdhury","manager":"Osama Abdulla","location":"Central Market"},{"name":"Darshan D","sales":19,"amount":259600,"hl":10,"hlConv":20.0,"meetings":277,"tl":"Bikash Chandra Naik","manager":"Bikash Chandra Naik","location":"Professional Pal Bangalore"},{"name":"Harinath J A","sales":19,"amount":453120,"hl":60,"hlConv":13.3,"meetings":345,"tl":"Manoj C Y","manager":"Pranav Kumar","location":"Bommasandra"},{"name":"Sathisha V L","sales":18,"amount":302965,"hl":37,"hlConv":2.7,"meetings":277,"tl":"Firoj Hussain","manager":"Firoj Hussain","location":"Marconix Sales"},{"name":"Nikhith S N","sales":18,"amount":250160,"hl":34,"hlConv":14.7,"meetings":258,"tl":"Dulal Chandra Rooj","manager":"Douzi Umar Ali Khan","location":"J P Nagar"},{"name":"Maruti Channabasappa Lakamapur","sales":18,"amount":276440,"hl":35,"hlConv":17.1,"meetings":325,"tl":"Lambani Annesh","manager":"Sripathi Mahesh Babu","location":"Bommanahalli"},{"name":"Tharunkumar B","sales":17,"amount":574660,"hl":49,"hlConv":18.4,"meetings":238,"tl":"Muddukrishna S M","manager":"Muddukrishna S M","location":"Excel Coworks Bangalore"},{"name":"M. Shajahan","sales":16,"amount":401790,"hl":0,"hlConv":0,"meetings":228,"tl":"Bikash Chandra Naik","manager":"Bikash Chandra Naik","location":"Professional Pal Bangalore"},{"name":"Suresh","sales":16,"amount":372880,"hl":38,"hlConv":26.3,"meetings":252,"tl":"Manoj C Y","manager":"Pranav Kumar","location":"Bommasandra"},{"name":"Raju Naik C","sales":15,"amount":449580,"hl":61,"hlConv":16.4,"meetings":268,"tl":"Valluru Mohan Reddy","manager":"Osama Abdulla","location":"Central Market"},{"name":"Pavan Dhule","sales":15,"amount":335120,"hl":48,"hlConv":14.6,"meetings":185,"tl":"Dulal Chandra Rooj","manager":"Vijay Girennavar","location":"J P Nagar"},{"name":"Shiva Nagenda C","sales":14,"amount":334825,"hl":0,"hlConv":0,"meetings":125,"tl":"Bikash Chandra Naik","manager":"Bikash Chandra Naik","location":"Professional Pal Bangalore"},{"name":"Megharaj P","sales":13,"amount":193520,"hl":63,"hlConv":9.5,"meetings":287,"tl":"Bikash Chandra Naik","manager":"Bikash Chandra Naik","location":"Khannba Enterprises"},{"name":"Abhishek Sharanappa Basaprabhu","sales":13,"amount":292640,"hl":32,"hlConv":9.4,"meetings":255,"tl":"Mahadevaswamy M","manager":"Pranav Kumar","location":"Bommasandra"},{"name":"Sharankumar","sales":12,"amount":368160,"hl":31,"hlConv":29.0,"meetings":319,"tl":"Mahadevaswamy M","manager":"Pranav Kumar","location":"Bommasandra"},{"name":"Dileepreddy T N","sales":12,"amount":221840,"hl":65,"hlConv":6.2,"meetings":307,"tl":"Valluru Mohan Reddy","manager":"Osama Abdulla","location":"Central Market"},{"name":"Yellanuru Vari Nagendra","sales":11,"amount":105020,"hl":14,"hlConv":14.3,"meetings":130,"tl":"Firoj Hussain","manager":"Firoj Hussain","location":"Marconix Sales"},{"name":"Somashekar H B","sales":11,"amount":184080,"hl":11,"hlConv":0.0,"meetings":213,"tl":"Bikash Chandra Naik","manager":"Bikash Chandra Naik","location":"Professional Pal Bangalore"},{"name":"Sumith Sanganal","sales":11,"amount":217120,"hl":43,"hlConv":14.0,"meetings":298,"tl":"Bikash Chandra Naik","manager":"Pranav Kumar","location":"Bommasandra"},{"name":"Govind Bagade","sales":11,"amount":301490,"hl":34,"hlConv":11.8,"meetings":291,"tl":"Bikash Chandra Naik","manager":"Pranav Kumar","location":"Bommasandra"},{"name":"G. Naveen","sales":11,"amount":184080,"hl":32,"hlConv":6.2,"meetings":235,"tl":"Lambani Annesh","manager":"Pranav Kumar","location":"J P Nagar"},{"name":"Prem Kumar S","sales":9,"amount":182605,"hl":31,"hlConv":9.7,"meetings":190,"tl":"Firoj Hussain","manager":"Nandeesh C","location":"Marconix Sales"},{"name":"Narayan","sales":9,"amount":151040,"hl":19,"hlConv":10.5,"meetings":242,"tl":"Bikash Chandra Naik","manager":"Bikash Chandra Naik","location":"Professional Pal Bangalore"},{"name":"Jaheer Abbas J","sales":9,"amount":108560,"hl":16,"hlConv":18.8,"meetings":80,"tl":"Bikash Chandra Naik","manager":"Bikash Chandra Naik","location":"Khannba Enterprises"},{"name":"Riyaz","sales":9,"amount":108560,"hl":7,"hlConv":28.6,"meetings":98,"tl":"Manoj C Y","manager":"Pranav Kumar","location":"Bommasandra"},{"name":"Poorna Chandra D","sales":9,"amount":141600,"hl":22,"hlConv":4.5,"meetings":208,"tl":"Muddukrishna S M","manager":"Vijay Girennavar","location":"Professional Pal Bangalore"},{"name":"Shrihari D","sales":9,"amount":174640,"hl":23,"hlConv":30.4,"meetings":163,"tl":"Dulal Chandra Rooj","manager":"Vijay Girennavar","location":"J P Nagar"},{"name":"Tharun M V","sales":9,"amount":273760,"hl":26,"hlConv":15.4,"meetings":195,"tl":"Muddukrishna S M","manager":"Muddukrishna S M","location":"Excel Coworks Bangalore"},{"name":"Anand Baraddi","sales":9,"amount":108560,"hl":24,"hlConv":16.7,"meetings":292,"tl":"Mahadevaswamy M","manager":"Pranav Kumar","location":"Bommasandra"},{"name":"M Aditya","sales":9,"amount":269040,"hl":20,"hlConv":20.0,"meetings":69,"tl":"Chandan M K","manager":"Muddukrishna S M","location":"Excel Coworks Bangalore"},{"name":"D M Bhargava","sales":8,"amount":34220,"hl":21,"hlConv":4.8,"meetings":325,"tl":"Bikash Chandra Naik","manager":"Bikash Chandra Naik","location":"Professional Pal Bangalore"},{"name":"Shivakumar","sales":8,"amount":103840,"hl":30,"hlConv":20.0,"meetings":189,"tl":"Shashikiran S N","manager":"Vijay Girennavar","location":"J P Nagar"},{"name":"Mohammed Imran G I","sales":8,"amount":169920,"hl":31,"hlConv":25.8,"meetings":117,"tl":"Somen Chowdhury","manager":"Osama Abdulla","location":"Central Market"},{"name":"Shashikiran S N","sales":7,"amount":33040,"hl":20,"hlConv":30.0,"meetings":231,"tl":"Suresh Dash","manager":"Osama Abdulla","location":"Central Market"},{"name":"Mohd Hammad Khan","sales":7,"amount":132160,"hl":22,"hlConv":4.5,"meetings":182,"tl":"Dulal Chandra Rooj","manager":"Douzi Umar Ali Khan","location":"J P Nagar"},{"name":"Vishal Kashinath Kharape","sales":7,"amount":99120,"hl":10,"hlConv":40.0,"meetings":78,"tl":"Somen Chowdhury","manager":"Osama Abdulla","location":"Central Market"},{"name":"Hemanth Kumar C S","sales":7,"amount":231280,"hl":22,"hlConv":22.7,"meetings":214,"tl":"Shashikiran S N","manager":"Vijay Girennavar","location":"J P Nagar"},{"name":"Abhishek","sales":7,"amount":132160,"hl":29,"hlConv":17.2,"meetings":309,"tl":"Manoj C Y","manager":"Pranav Kumar","location":"Bommasandra"},{"name":"Fahad D Sanadi","sales":6,"amount":94400,"hl":15,"hlConv":33.3,"meetings":106,"tl":"Sandeep Kumar","manager":"Osama Abdulla","location":"Central Market"},{"name":"Abdul Muiz S","sales":6,"amount":127440,"hl":21,"hlConv":14.3,"meetings":164,"tl":"Lambani Annesh","manager":"Sripathi Mahesh Babu","location":"Bommanahalli"},{"name":"Rahul Adithya R","sales":6,"amount":208860,"hl":13,"hlConv":7.7,"meetings":98,"tl":"Valluru Mohan Reddy","manager":"Osama Abdulla","location":"Central Market"},{"name":"Amar Veeranna Sahukar","sales":6,"amount":127440,"hl":12,"hlConv":33.3,"meetings":111,"tl":"Lambani Annesh","manager":"Sripathi Mahesh Babu","location":"Bommanahalli"},{"name":"Santosh S Gotagodi","sales":6,"amount":127440,"hl":15,"hlConv":13.3,"meetings":180,"tl":"Lambani Annesh","manager":"Pranav Kumar","location":"Bommasandra"},{"name":"Yogish Santosh Bulabule","sales":5,"amount":56640,"hl":9,"hlConv":33.3,"meetings":107,"tl":"Lambani Annesh","manager":"Sripathi Mahesh Babu","location":"Bommanahalli"},{"name":"Shyam Sundr Reddy K S","sales":5,"amount":155760,"hl":17,"hlConv":5.9,"meetings":74,"tl":"Muddukrishna S M","manager":"Nandeesh C","location":"Excel Coworks Bangalore"},{"name":"Megharaja N M","sales":4,"amount":44840,"hl":0,"hlConv":0,"meetings":45,"tl":"Firoj Hussain","manager":"Nandeesh C","location":"Marconix Sales"},{"name":"Amit Kumar","sales":4,"amount":84960,"hl":7,"hlConv":57.1,"meetings":58,"tl":"Firoj Hussain","manager":"Nandeesh C","location":"Marconix Sales"},{"name":"Suraj Kumar","sales":4,"amount":84960,"hl":35,"hlConv":8.6,"meetings":125,"tl":"Chandan M K","manager":"Vijay Girennavar","location":"Professional Pal Bangalore"},{"name":"Rohith V","sales":4,"amount":48200,"hl":12,"hlConv":16.7,"meetings":118,"tl":"Sunpreet Singh","manager":"Pranav Kumar","location":"Bommasandra"},{"name":"Ramangouda","sales":4,"amount":118000,"hl":21,"hlConv":19.0,"meetings":50,"tl":"Valluru Mohan Reddy","manager":"Osama Abdulla","location":"Central Market"},{"name":"Firoj Hussain","sales":3,"amount":42480,"hl":0,"hlConv":0,"meetings":383,"tl":"","manager":"Firoj Hussain","location":"Marconix Sales"},{"name":"Chandrakant S Biradar","sales":3,"amount":40120,"hl":0,"hlConv":0,"meetings":19,"tl":"Firoj Hussain","manager":"Firoj Hussain","location":"Marconix Sales"},{"name":"Sushant Janrao Thakre","sales":3,"amount":47200,"hl":2,"hlConv":0.0,"meetings":44,"tl":"Somen Chowdhury","manager":"Osama Abdulla","location":"Central Market"},{"name":"Vijay Kumar B","sales":3,"amount":47200,"hl":5,"hlConv":20.0,"meetings":35,"tl":"Sunpreet Singh","manager":"Sripathi Mahesh Babu","location":"Bommanahalli"},{"name":"Getti Bhargava","sales":3,"amount":47200,"hl":20,"hlConv":0.0,"meetings":101,"tl":"Bikash Chandra Naik","manager":"Bikash Chandra Naik","location":"Khannba Enterprises"},{"name":"Muddukrishna S M","sales":3,"amount":80240,"hl":17,"hlConv":11.8,"meetings":287,"tl":"","manager":"Muddukrishna S M","location":"Excel Coworks Bangalore"},{"name":"Murali N","sales":3,"amount":80240,"hl":1,"hlConv":100.0,"meetings":50,"tl":"Muddukrishna S M","manager":"Muddukrishna S M","location":"Excel Coworks Bangalore"},{"name":"Chandan B M","sales":3,"amount":62540,"hl":16,"hlConv":12.5,"meetings":22,"tl":"Chandan M K","manager":"Sripathi Mahesh Babu","location":"Excel Coworks Bangalore"}],"monthly":{"labels":["1-May-25","1-Jun-25","1-Jul-25","1-Aug-25","1-Sep-25","1-Oct-25","1-Nov-25","1-Dec-25","1-Jan-26","1-Feb-26","1-Mar-26","1-Apr-26","1-May-26","1-Jun-26"],"sales":[17,13,31,34,27,81,168,142,176,175,150,103,112,13],"amount":[341610,164020,522740,564630,327745,1213580,2817840,2664400,3687500,3832050,3630558,2400120,2748275,351960]},"weekly":{"labels":["29-04 Jan'26","02-08 Feb'26","09-15 Feb'26","16-22 Feb'26","26-01 Feb'26","02-08 Mar'26","09-15 Mar'26","16-22 Mar'26","23-01 Mar'26","23-29 Mar'26","06-12 Apr'26","13-19 Apr'26","20-26 Apr'26","30-05 Apr'26","04-10 May'26","11-17 May'26","18-24 May'26","25-31 May'26","27-03 May'26","01-07 Jun'26"],"sales":[32,41,37,44,42,24,30,21,53,32,23,30,20,48,18,24,25,45,25,13],"amount":[601800,1151680,637200,1014800,826000,562096,658440,495600,1028370,745760,472000,751660,424800,1291382,316240,592120,481440,1358475,628940,351960],"meetings":[753,762,911,872,791,736,888,749,903,1032,765,750,522,567,637,605,578,670,465,335]},"vintage":{"0-60 D":75,"61-180 D":45,"181-270 D":10,"270+ D":31},"hlExecs":[{"name":"S Suhail","assigned":138,"sold":21,"conv":15.2},{"name":"Raaghu B V","assigned":134,"sold":26,"conv":19.4},{"name":"Selvin Samuel","assigned":128,"sold":18,"conv":14.1},{"name":"C Varun Gouda","assigned":123,"sold":31,"conv":25.2},{"name":"Syed Kaif","assigned":114,"sold":17,"conv":14.9},{"name":"Hemantha M","assigned":100,"sold":12,"conv":12.0},{"name":"Sambit Kumar Das","assigned":92,"sold":17,"conv":18.5},{"name":"Md Meraj","assigned":75,"sold":7,"conv":9.3},{"name":"Yashassu N S","assigned":74,"sold":14,"conv":18.9},{"name":"Sunil Kumar K S","assigned":74,"sold":8,"conv":10.8},{"name":"Jyoti Prakash Sahu","assigned":73,"sold":18,"conv":24.7},{"name":"Jampanna R","assigned":73,"sold":7,"conv":9.6},{"name":"Ullas Gadageppa Doni","assigned":71,"sold":6,"conv":8.5},{"name":"Chandan Kumar B V","assigned":70,"sold":11,"conv":15.7},{"name":"Bhagavantraya","assigned":70,"sold":14,"conv":20.0},{"name":"Ravi Pandey","assigned":67,"sold":14,"conv":20.9},{"name":"Anand Naik D","assigned":67,"sold":11,"conv":16.4},{"name":"Dileepreddy T N","assigned":65,"sold":4,"conv":6.2},{"name":"Megharaj P","assigned":63,"sold":6,"conv":9.5},{"name":"Deepak R","assigned":63,"sold":13,"conv":20.6}],"mtgWeekly":{"labels":["26-01 Feb'26","02-08 Mar'26","09-15 Mar'26","16-22 Mar'26","23-01 Mar'26","23-29 Mar'26","06-12 Apr'26","13-19 Apr'26","20-26 Apr'26","30-05 Apr'26","04-10 May'26","11-17 May'26","18-24 May'26","25-31 May'26","27-03 May'26","01-07 Jun'26"],"fresh":[486,497,601,491,554,631,518,492,353,281,428,387,353,358,271,206],"followup":[305,239,287,258,349,401,247,258,169,286,209,218,225,312,194,129]},"team":[{"name":"Nandeesh C","role":"Regional Manager","manager":"Siddhant Srivastava","location":"Karnataka/Bommasandra","doj":"28-Apr-25"},{"name":"Pranav Kumar","role":"Branch Manager","manager":"Nandeesh C","location":"Karnataka/Bommasandra","doj":"16-Jun-25"},{"name":"Lavel Veevan D Silva","role":"Area Manager","manager":"Nandeesh C","location":"NSD Channel Sales (FSF - Top Cities) Khannba Enterprises Private Limited Bangalore","doj":"11-Aug-25"},{"name":"Sandeepan Sengupta","role":"Manager","manager":"Somen Chowdhury","location":"Karnataka/Central Market*","doj":"13-Apr-26"},{"name":"Somen Chowdhury","role":"Branch Sales Manager","manager":"Nandeesh C","location":"Karnataka/Central Market*","doj":"19-Apr-24"},{"name":"Firoj Hussain","role":"Manager","manager":"Nandeesh C","location":"NSD Channel Sales (FSF - Top Cities) Excel Coworks Bangalore","doj":"22-May-23"},{"name":"Yearmalwar Sai Rahul Kumar","role":"Manager","manager":"Somen Chowdhury","location":"Karnataka/Central Market*","doj":"1-Jun-26"},{"name":"Bikash Chandra Naik","role":"Manager","manager":"Somen Chowdhury","location":"Karnataka/Central Market*","doj":"13-Sep-24"},{"name":"Dulal Chandra Rooj","role":"Manager","manager":"Somen Chowdhury","location":"Karnataka/Central Market*","doj":"19-Aug-24"},{"name":"Valluru Mohan Reddy","role":"Manager","manager":"Pranav Kumar","location":"Karnataka/Bommasandra","doj":"17-Jun-24"},{"name":"Arun Prasad N","role":"Manager","manager":"Pranav Kumar","location":"Karnataka/Bommasandra","doj":"13-Sep-24"},{"name":"Lambani Annesh","role":"Manager","manager":"Pranav Kumar","location":"Karnataka/Bommasandra","doj":"5-Aug-24"},{"name":"Yashassu N S","role":"Sr. Executive","manager":"Arun Prasad N","location":"Karnataka/Bommasandra","doj":"3-Mar-25"},{"name":"Raaghu B V","role":"Sr. Executive","manager":"Sandeepan Sengupta","location":"Karnataka/Central Market*","doj":"4-Aug-25"},{"name":"S Suhail","role":"Sr. Executive","manager":"Dulal Chandra Rooj","location":"Karnataka/Central Market*","doj":"23-Sep-24"},{"name":"Selvin Samuel","role":"Sr. Executive","manager":"Bikash Chandra Naik","location":"Karnataka/Central Market*","doj":"30-Sep-24"},{"name":"C Varun Gouda","role":"Sr. Executive","manager":"Pranav Kumar","location":"Karnataka/Bommasandra","doj":"5-Nov-24"},{"name":"Shashank R","role":"Executive","manager":"Arun Prasad N","location":"Karnataka/Bommasandra","doj":"18-May-26"},{"name":"Jyoti Prakash Sahu","role":"Executive","manager":"Sandeepan Sengupta","location":"Karnataka/Central Market*","doj":"23-Sep-24"},{"name":"Sambit Kumar Das","role":"Executive","manager":"Bikash Chandra Naik","location":"Karnataka/Central Market*","doj":"4-Aug-25"},{"name":"Hemantha M","role":"Executive","manager":"Valluru Mohan Reddy","location":"Karnataka/Bommasandra","doj":"6-Oct-25"},{"name":"Deepak R","role":"Executive","manager":"Lambani Annesh","location":"Karnataka/Bommasandra","doj":"3-Mar-25"},{"name":"Syed Kaif","role":"Executive","manager":"Dulal Chandra Rooj","location":"Karnataka/Central Market*","doj":"11-Mar-25"},{"name":"Govind Bagade","role":"Executive","manager":"Lambani Annesh","location":"Karnataka/Bommasandra","doj":"15-Dec-25"},{"name":"Ullas Gadageppa Doni","role":"Executive","manager":"Arun Prasad N","location":"Karnataka/Bommasandra","doj":"29-Sep-25"},{"name":"Sharankumar","role":"Executive","manager":"Valluru Mohan Reddy","location":"Karnataka/Bommasandra","doj":"17-Nov-25"},{"name":"Sumith Sanganal","role":"Executive","manager":"Arun Prasad N","location":"Karnataka/Bommasandra","doj":"1-Dec-25"},{"name":"Anand Baraddi","role":"Executive","manager":"Valluru Mohan Reddy","location":"Karnataka/Bommasandra","doj":"1-Dec-25"},{"name":"Maruti Channabasappa Lakamapur","role":"Executive","manager":"Lambani Annesh","location":"Karnataka/Bommasandra","doj":"8-Dec-25"},{"name":"Dileepreddy T N","role":"Executive","manager":"Bikash Chandra Naik","location":"Karnataka/Central Market*","doj":"1-Dec-25"},{"name":"Abhishek","role":"Executive","manager":"Arun Prasad N","location":"Karnataka/Bommasandra","doj":"1-Dec-25"},{"name":"Abhishek Sharanappa Basaprabhu","role":"Executive","manager":"Valluru Mohan Reddy","location":"Karnataka/Bommasandra","doj":"8-Dec-25"},{"name":"Suresh","role":"Executive","manager":"Lambani Annesh","location":"Karnataka/Bommasandra","doj":"15-Dec-25"},{"name":"G. Naveen","role":"Executive","manager":"Valluru Mohan Reddy","location":"Karnataka/Bommasandra","doj":"12-Jan-26"},{"name":"Mohammed Imran G I","role":"Executive","manager":"Bikash Chandra Naik","location":"Karnataka/Central Market*","doj":"2-Feb-26"},{"name":"S Sumeet Kumar","role":"Executive","manager":"Dulal Chandra Rooj","location":"Karnataka/Central Market*","doj":"27-Apr-26"},{"name":"Veerendra M M","role":"Executive","manager":"Lambani Annesh","location":"Karnataka/Bommasandra","doj":"11-May-26"},{"name":"Shubham Gupta","role":"Executive","manager":"Dulal Chandra Rooj","location":"Karnataka/Central Market*","doj":"18-May-26"},{"name":"Chandan M K","role":"Service Providers Manager","manager":"Sharan Tej M R","location":"NSD Channel Sales (FSF - Top Cities) Excel Coworks Bangalore","doj":"9-Sep-24"},{"name":"Tharun M V","role":"Service Providers Associate","manager":"Chandan M K","location":"NSD Channel Sales (FSF - Top Cities) Excel Coworks Bangalore","doj":"15-Dec-25"},{"name":"Chandan B M","role":"Service Providers Associate","manager":"Sharan Tej M R","location":"NSD Channel Sales (FSF - Top Cities) Excel Coworks Bangalore","doj":"15-Dec-25"},{"name":"Tharunkumar B","role":"Service Providers Associate","manager":"Chandan M K","location":"NSD Channel Sales (FSF - Top Cities) Excel Coworks Bangalore","doj":"22-Dec-25"},{"name":"Sharan Tej M R","role":"Service Providers Area Manager","manager":"Firoj Hussain","location":"NSD Channel Sales (FSF - Top Cities) Excel Coworks Bangalore","doj":"5-Jan-26"},{"name":"M Aditya","role":"Service Providers Associate","manager":"Chandan M K","location":"NSD Channel Sales (FSF - Top Cities) Excel Coworks Bangalore","doj":"2-Feb-26"},{"name":"Sunil Kumar P R","role":"Service Providers Associate","manager":"Chandan M K","location":"NSD Channel Sales (FSF - Top Cities) Excel Coworks Bangalore","doj":"23-Mar-26"},{"name":"Sushmoy Banik","role":"Service Providers Associate","manager":"Lavel Veevan D Silva","location":"NSD Channel Sales (FSF - Top Cities) Khannba Enterprises Private Limited Bangalore","doj":"20-Apr-26"},{"name":"Ningaraj Basuraj Adarakatti","role":"Service Providers Associate","manager":"Lavel Veevan D Silva","location":"NSD Channel Sales (FSF - Top Cities) Khannba Enterprises Private Limited Bangalore","doj":"27-Apr-26"}]}
+;
+
+const NC=(()=>{
+const C=['#7c6ff7','#e879f9','#22d3ee','#4ade80','#fb923c','#fbbf24','#a78bfa','#34d399'];
+const BG={color:'rgba(255,255,255,.04)',drawBorder:false,borderDash:[3,3]};
+const BF={family:"'Inter',sans-serif",size:11};
+const BT={color:'#5a5a7a',font:BF};
+const BL={labels:{color:'#9898b8',font:BF,boxWidth:10,boxHeight:10,padding:12}};
+const BTO={backgroundColor:'#13131f',borderColor:'rgba(124,111,247,.25)',borderWidth:1,titleColor:'#f1f1ff',bodyColor:'#9898b8',padding:10};
+const I={};
+const G=(ctx,t,b)=>{const g=ctx.createLinearGradient(0,0,0,ctx.canvas.height);g.addColorStop(0,t);g.addColorStop(1,b);return g;};
+const kill=id=>{if(I[id]){I[id].destroy();delete I[id];}};
+const fy=v=>v>=100000?'₹'+(v/100000).toFixed(1)+'L':v>=1000?(v/1000).toFixed(0)+'K':v;
+
+function line(id,labels,datasets,opts={}){
+  kill(id);const cv=document.getElementById(id);if(!cv)return;const ctx=cv.getContext('2d');
+  I[id]=new Chart(ctx,{type:'line',data:{labels,datasets:datasets.map((ds,i)=>{
+    const col=ds.color||C[i%8];
+    return{label:ds.label,data:ds.data,borderColor:col,borderWidth:2.5,pointRadius:2,
+      pointHoverRadius:5,pointBackgroundColor:col,tension:.4,fill:ds.fill!==false,
+      backgroundColor:ds.fill!==false?G(ctx,col+'22',col+'00'):'transparent'};
+  })},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:BL,tooltip:BTO},
+    scales:{x:{grid:BG,ticks:{...BT,maxRotation:38,font:{...BF,size:10}},border:{color:'rgba(255,255,255,.04)'}},
+            y:{grid:BG,ticks:{...BT,callback:v=>opts.c?fy(v):v},border:{color:'rgba(255,255,255,.04)'},beginAtZero:true}}}});}
+
+function bar(id,labels,datasets,opts={}){
+  kill(id);const cv=document.getElementById(id);if(!cv)return;const ctx=cv.getContext('2d');
+  I[id]=new Chart(ctx,{type:'bar',data:{labels,datasets:datasets.map((ds,i)=>{return{label:ds.label,data:ds.data,backgroundColor:ds.color||C[i%8],borderRadius:5,borderSkipped:false,maxBarThickness:42}})}},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:BL,tooltip:BTO},
+      scales:{x:{grid:{...BG,display:false},ticks:{...BT,maxRotation:38,font:{...BF,size:10}},border:{color:'rgba(255,255,255,.04)'}},
+              y:{grid:BG,ticks:{...BT,callback:v=>opts.c?fy(v):v},border:{color:'rgba(255,255,255,.04)'},beginAtZero:true}}}});}
+
+function hbar(id,labels,data,opts={}){
+  kill(id);const cv=document.getElementById(id);if(!cv)return;const ctx=cv.getContext('2d');
+  I[id]=new Chart(ctx,{type:'bar',data:{labels,datasets:[{data,backgroundColor:labels.map((_,i)=>C[i%8]),borderRadius:5,borderSkipped:false,maxBarThickness:26}]}},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:BTO},
+      scales:{x:{grid:BG,ticks:{...BT,callback:v=>opts.c?fy(v):v},border:{color:'rgba(255,255,255,.04)'}},
+              y:{grid:{display:false},ticks:{...BT,font:{...BF,size:10}},border:{color:'rgba(255,255,255,.04)'}}}}});}
+
+function donut(id,labels,data){
+  kill(id);const cv=document.getElementById(id);if(!cv)return;const ctx=cv.getContext('2d');
+  I[id]=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:C.slice(0,data.length),borderWidth:0,hoverOffset:4}]}},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'72%',
+      plugins:{legend:{display:false},tooltip:{...BTO,callbacks:{label:c=>` ${c.label}: ${c.parsed.toLocaleString('en-IN')}`}}}}});}
+
+return{line,bar,hbar,donut,kill};
+})();
+
+const D=(()=>{
+let M=null;let FILES=[];let TAB='summary';
+const $=id=>document.getElementById(id);
+const fL=n=>{if(!n||isNaN(n))return'—';n=Number(n);
+  if(n>=10000000)return'₹'+(n/10000000).toFixed(2)+'Cr';
+  if(n>=100000)return'₹'+(n/100000).toFixed(2)+'L';
+  return'₹'+n.toLocaleString('en-IN');};
+const fN=n=>n==null?'—':Number(n).toLocaleString('en-IN');
+const rb=i=>{
+  if(i===0)return'<span class="rb gld">🥇</span>';
+  if(i===1)return'<span class="rb slv">🥈</span>';
+  if(i===2)return'<span class="rb brz">🥉</span>';
+  return`<span class="rb nrm">${i+1}</span>`;};
+const bc=(v,mx)=>{const p=mx?Math.min((v/mx)*100,100):0;
+  return`<div class="bw" style="width:82px"><div class="bf bv" style="width:${p}%"></div></div>`;};
+const kc=(l,v,i,col,s,bc2='neu')=>
+  `<div class="kc" style="--kclr:${col}">
+    <div class="kl"><div class="kd"></div>${l}</div>
+    <div class="kv">${v}</div>
+    <div class="ks"><span class="kb ${bc2}">${s}</span></div>
+    <div class="ki">${i}</div>
+  </div>`;
+
+function toast(msg,t='ti'){const c=$('toasts');if(!c)return;
+  const d=document.createElement('div');d.className=`toast ${t}`;
+  d.innerHTML=`<span>${t==='ts'?'✅':t==='te'?'❌':'ℹ️'}</span> ${msg}`;
+  c.appendChild(d);setTimeout(()=>d.remove(),4000);}
+
+let fi=null;
+function initUpload(){
+  if(fi)return;
+  fi=document.createElement('input');fi.type='file';fi.multiple=true;
+  fi.accept='.xlsx,.xlsb,.csv,.xls';fi.style.display='none';document.body.appendChild(fi);
+  $('ubrowse')?.addEventListener('click',()=>fi.click());
+  fi.addEventListener('change',()=>{addFiles(Array.from(fi.files));fi.value='';});
+  const drop=$('udrop');
+  if(drop){
+    drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('dov');});
+    drop.addEventListener('dragleave',()=>drop.classList.remove('dov'));
+    drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('dov');addFiles(Array.from(e.dataTransfer.files));});
+  }
+}
+function addFiles(nf){
+  const v=nf.filter(f=>/\.(xlsx|xlsb|csv|xls)$/i.test(f.name));
+  if(!v.length){toast('Upload .xlsx .xlsb .csv .xls only','te');return;}
+  v.forEach(f=>{if(!FILES.find(x=>x.name===f.name))FILES.push(f);});
+  renderFL();}
+function renderFL(){
+  const l=$('flist');if(!l)return;l.innerHTML='';
+  FILES.forEach((f,i)=>{
+    const ext=f.name.split('.').pop().toUpperCase();
+    const sz=f.size>1048576?(f.size/1048576).toFixed(1)+'MB':(f.size/1024).toFixed(0)+'KB';
+    const d=document.createElement('div');d.className='fi';
+    d.innerHTML=`<div class="fi-ico">${ext==='CSV'?'📊':'📗'}</div>
+      <div class="fi-inf"><div class="fi-nm">${f.name}</div>
+      <div class="fi-mt">${sz} · ${ext}</div>
+      <div class="fi-pr"><div class="fi-pb" style="width:100%"></div></div></div>
+      <button class="fi-rm" onclick="D._rm(${i})">✕</button>`;
+    l.appendChild(d);});
+  const w=$('runwrap');if(w)w.style.display=FILES.length?'block':'none';}
+function _rm(i){FILES.splice(i,1);renderFL();}
+function showU(){const m=$('umodal');if(m)m.classList.add('show');initUpload();}
+function hideU(){const m=$('umodal');if(m)m.classList.remove('show');}
+
+async function process(){
+  if(!FILES.length){toast('Add files first','te');return;}
+  const ov=document.createElement('div');ov.className='lov';ov.id='lov';
+  ov.innerHTML='<div class="spin"></div><div style="font-size:.8rem;color:#9898b8">Parsing files…</div>';
+  document.body.appendChild(ov);
+  try{
+    const sm={};
+    for(const file of FILES){
+      const buf=await file.arrayBuffer();
+      const wb=window.XLSX.read(buf,{type:'array',raw:true});
+      for(const sn of wb.SheetNames){
+        const rows=window.XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,defval:null,raw:true});
+        if(rows.length>1)sm[sn]=rows;
+      }
+    }
+    M=buildFromSheets(sm);
+    try{localStorage.setItem('nsd_m',JSON.stringify(M));}catch(e){}
+    document.getElementById('lov')?.remove();
+    hideU();
+    updateTopbar(M);
+    toast(`✅ ${FILES.length} file(s) · ${Object.keys(sm).length} sheets loaded`,'ts');
+    renderTab(TAB);
+  }catch(e){document.getElementById('lov')?.remove();toast('Error: '+e.message,'te');console.error(e);}
+}
+
+function buildFromSheets(sm){
+  const keys=Object.keys(sm);
+  const fs=(...n)=>{for(const x of n){const k=keys.find(k=>k.toLowerCase().includes(x));if(k)return sm[k];}return null;};
+  const sr=v=>{try{return parseFloat(String(v||0).replace(',',''))||0;}catch{return 0;}};
+  const pr=rows=>{if(!rows||rows.length<2)return[];
+    const h=rows[0].map(x=>String(x||'').trim());
+    return rows.slice(1).map(r=>{const o={};h.forEach((k,i)=>{o[k]=r[i];});return o;})
+      .filter(r=>Object.values(r).some(v=>v!=null&&v!==''));};
+  const srows=pr(fs('sale dump','main sale','saledump','sale')||sm[keys[0]]||[]);
+  const em={};
+  for(const r of srows){
+    const e=r['Executive']||r['Exec Name']||r['Name']||'';if(!e)continue;
+    const a=sr(r['Receipt Amount']||r['Amount']||0);
+    if(!em[e])em[e]={sales:0,amount:0,tl:r['TL']||'',manager:r['L3 Name']||r['Manager']||'',location:r['Location']||'',hl:0,hlConv:0,meetings:0};
+    em[e].sales++;em[e].amount+=a;
+  }
+  const execs=Object.entries(em).map(([n,d])=>(({name:n,...d,amount:Math.round(d.amount)})))
+    .sort((a,b)=>b.sales-a.sales);
+  const mm={};
+  for(const e of execs){const m2=e.manager||'?';if(!mm[m2])mm[m2]={sales:0,amount:0,hc:0};mm[m2].sales+=e.sales;mm[m2].amount+=e.amount;mm[m2].hc++;}
+  const managers=Object.entries(mm).map(([n,d])=>(({name:n,...d}))).sort((a,b)=>b.sales-a.sales);
+  const lm={};
+  for(const e of execs){const l=e.location||'?';if(!lm[l])lm[l]={sales:0,amount:0,hc:0};lm[l].sales+=e.sales;lm[l].amount+=e.amount;lm[l].hc++;}
+  const locations=Object.entries(lm).map(([n,d])=>(({name:n,...d}))).sort((a,b)=>b.sales-a.sales);
+  const wm={};
+  for(const r of srows){const w=r['Week']||'';const a=sr(r['Receipt Amount']||0);if(!w)continue;if(!wm[w])wm[w]={sales:0,amount:0};wm[w].sales++;wm[w].amount+=a;}
+  const wk=Object.keys(wm).sort();
+  const totS=execs.reduce((s,e)=>s+e.sales,0),totR=execs.reduce((s,e)=>s+e.amount,0);
+  return{meta:{totalSales:totS,totalRevenue:totR,totalHC:execs.length,activeHC:Math.round(execs.length*.8),
+    totalMeetings:0,hlAssigned:0,hlSold:0,hlConvOverall:0,
+    topManager:managers[0]?.name||'',topExec:execs[0]?.name||'',
+    bestLocation:locations[0]?.name||'',worstLocation:locations[locations.length-1]?.name||''},
+    managers,locations,execs:execs.slice(0,80),
+    monthly:{labels:[],sales:[],amount:[]},
+    weekly:{labels:wk,sales:wk.map(k=>wm[k].sales),amount:wk.map(k=>Math.round(wm[k].amount))},
+    vintage:{'0-60 D':0,'61-180 D':0,'181-270 D':0,'270+ D':0},
+    hlExecs:[],mtgWeekly:{labels:[],fresh:[],followup:[]},team:[]};
+}
+
+function data(){return M||LIVE;}
+function updateTopbar(D){
+  const m=D.meta;
+  $('tb-meta').innerHTML=`<div class="ldot"></div> ${m.bestLocation||'Bommasandra'} · ${fL(m.totalRevenue)} · ${fN(m.totalSales)} Sales`;
+  $('sf-data').textContent=`${fN(m.totalSales)} Sales · ${fN(m.totalHC)} HC`;}
+
+function initNav(){
+  document.querySelectorAll('.ni[data-tab]').forEach(n=>{
+    n.addEventListener('click',()=>{
+      document.querySelectorAll('.ni').forEach(x=>x.classList.remove('active'));
+      n.classList.add('active');TAB=n.dataset.tab;renderTab(TAB);});});}
+
+function renderTab(t){
+  const d=data();
+  const map={summary,sales,manager,exec,location,hl,meetings,vintage,kpi,team};
+  if(map[t])map[t](d);else summary(d);
+}
+
+function summary(D){
+  const m=D.meta,wL=D.weekly.labels.slice(-8),wS=D.weekly.sales.slice(-8);
+  $('dz').innerHTML=`
+  <div class="ph">
+    <div><h1>📊 Executive Summary</h1><p>Bommasandra · AMJ 2025–26 · Consolidated view</p></div>
+    <div class="ph-a">
+      <button class="tbtn" onclick="D.exp()">⬇️ Export</button>
+      <button class="tbtn p" onclick="D.showU()">📂 Load New Files</button>
+    </div>
+  </div>
+  <div class="kg">
+    ${kc('Total Sales','1,242','💰','var(--c1)','AMJ Period','up')}
+    ${kc('Total Revenue','₹2.53Cr','📈','var(--c4)','Receipt Amount','up')}
+    ${kc('Total HC',fN(m.totalHC),'👥','var(--c3)',`Active: ${fN(m.activeHC)}`,'neu')}
+    ${kc('HL Assigned',fN(m.hlAssigned),'🎯','var(--c6)',`Sold: ${fN(m.hlSold)}`,'neu')}
+    ${kc('HL Conversion',m.hlConvOverall+'%','🔥','var(--c2)','HL → Sale','up')}
+    ${kc('Total Meetings',fN(m.totalMeetings),'🤝','var(--c5)','Fresh + Followup','neu')}
+    ${kc('Top Manager',m.topManager.split(' ')[0],'🏆','var(--c6)','Highest sales','up')}
+    ${kc('Best Branch',m.bestLocation.split(' ')[0],'📍','var(--c4)','Top revenue','up')}
+  </div>
+  <div class="g21 mb20">
+    <div class="card">
+      <div class="ch"><div class="ct">📈 Weekly Sales Trend</div><span class="cbdg">Last 8 Weeks</span></div>
+      <div class="cb"><div class="cw" style="height:215px"><canvas id="ch-s-wk"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct">📍 Revenue by Location</div></div>
+      <div class="cb" style="display:flex;gap:12px;align-items:center">
+        <div class="cw" style="height:175px;width:160px;flex-shrink:0"><canvas id="ch-loc-d"></canvas></div>
+        <div class="dl">
+          ${D.locations.slice(0,6).map((l,i)=>`<div class="dl-i"><div class="dl-d" style="background:${['#7c6ff7','#e879f9','#22d3ee','#4ade80','#fb923c','#fbbf24'][i]}"></div><span class="dl-l">${l.name.split(' ').slice(0,2).join(' ')}</span><span class="dl-v">${fL(l.amount)}</span></div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sdiv"><div class="sdiv-t">Manager Snapshot</div><div class="sdiv-l"></div></div>
+  <div class="g4 mb20">
+    ${D.managers.slice(0,4).map((mg,i)=>`<div class="card"><div class="cb">
+      <div style="font-size:.65rem;color:var(--tm);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px">${['🥇','🥈','🥉','4️⃣'][i]} Manager</div>
+      <div style="font-size:.9rem;font-weight:800;color:var(--tp);margin-bottom:4px">${mg.name}</div>
+      <div style="font-size:1.05rem;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--as)">${fL(mg.amount)}</div>
+      <div style="font-size:.7rem;color:var(--tm);margin-top:4px">${mg.sales} sales · ${mg.hc} execs</div>
+      <div class="bw" style="margin-top:8px"><div class="bf bv" style="width:${Math.round((mg.sales/D.managers[0].sales)*100)}%"></div></div>
+    </div></div>`).join('')}
+  </div>
+  <div class="sdiv"><div class="sdiv-t">Key Insights</div><div class="sdiv-l"></div></div>
+  <div class="ig">
+    <div class="ii"><div class="ii-ico">🏆</div><div class="ii-t"><strong>Top Manager: ${m.topManager}</strong><span>${D.managers[0]?.sales||0} sales · ${fL(D.managers[0]?.amount||0)}</span></div></div>
+    <div class="ii"><div class="ii-ico">👨‍💼</div><div class="ii-t"><strong>Top Exec: ${m.topExec}</strong><span>${D.execs[0]?.sales||0} sales · Conv: ${D.execs[0]?.hlConv||0}%</span></div></div>
+    <div class="ii"><div class="ii-ico">📍</div><div class="ii-t"><strong>Best: ${m.bestLocation}</strong><span>${D.locations[0]?.sales||0} sales · ${fL(D.locations[0]?.amount||0)}</span></div></div>
+    <div class="ii"><div class="ii-ico">🎯</div><div class="ii-t"><strong>HL Conv: ${m.hlConvOverall}%</strong><span>${m.hlSold} of ${m.hlAssigned} HLs → sale</span></div></div>
+    <div class="ii"><div class="ii-ico">🤝</div><div class="ii-t"><strong>27,423 Meetings</strong><span>17,378 Fresh + 10,045 Followup</span></div></div>
+    <div class="ii"><div class="ii-ico">⚡</div><div class="ii-t"><strong>Productivity</strong><span>₹${Math.round(m.totalRevenue/m.totalHC).toLocaleString('en-IN')} per head</span></div></div>
+  </div>`;
+  NC.line('ch-s-wk',wL,[{label:'Sales',data:wS,color:'#7c6ff7'}]);
+  NC.donut('ch-loc-d',D.locations.map(l=>l.name.split(' ').slice(0,2).join(' ')),D.locations.map(l=>l.amount));
+}
+
+function sales(D){
+  $('dz').innerHTML=`
+  <div class="ph"><div><h1>📈 Sales Performance</h1><p>Monthly & weekly trends · AMJ 2025–26</p></div></div>
+  <div class="kg">
+    ${kc('Total Sales','1,242','💰','var(--c1)','AMJ Period','up')}
+    ${kc('Revenue','₹2.53Cr','📊','var(--c4)','All receipts','up')}
+    ${kc('Best Month','Feb 2026','📅','var(--c3)','175 sales · ₹38.3L','up')}
+    ${kc('Jan 2026','176 sales','📆','var(--c6)','₹36.9L revenue','up')}
+    ${kc('Avg/Month','~89','⚡','var(--c2)','Sales per month','neu')}
+    ${kc('Avg Ticket',fL(Math.round(25267028/1242)),'🏷️','var(--c5)','Per sale','neu')}
+  </div>
+  <div class="g2 mb20">
+    <div class="card"><div class="ch"><div class="ct">📈 Monthly Sales Count</div><span class="cbdg">14 Months</span></div>
+      <div class="cb"><div class="cw" style="height:215px"><canvas id="ch-mon-s"></canvas></div></div></div>
+    <div class="card"><div class="ch"><div class="ct">💰 Monthly Revenue</div></div>
+      <div class="cb"><div class="cw" style="height:215px"><canvas id="ch-mon-r"></canvas></div></div></div>
+  </div>
+  <div class="card mb20"><div class="ch"><div class="ct">📊 Weekly Trend</div><span class="cbdg">Last 20 Weeks</span></div>
+    <div class="cb"><div class="cw" style="height:215px"><canvas id="ch-wk-tr"></canvas></div></div></div>
+  <div class="g2">
+    <div class="card"><div class="ch"><div class="ct">📋 Monthly Breakdown</div></div>
+      <div class="cb p0"><div class="tw"><table class="dt">
+        <thead><tr><th>Month</th><th>Sales</th><th>Revenue</th><th>Avg Ticket</th></tr></thead>
+        <tbody>${D.monthly.labels.map((lb,i)=>`<tr><td class="tn">${lb}</td><td class="tv">${fN(D.monthly.sales[i])}</td>
+          <td class="tv">${fL(D.monthly.amount[i])}</td>
+          <td>${D.monthly.sales[i]?fL(Math.round(D.monthly.amount[i]/D.monthly.sales[i])):'—'}</td></tr>`).join('')}</tbody>
+      </table></div></div></div>
+    <div class="card"><div class="ch"><div class="ct">📊 Revenue by Month</div></div>
+      <div class="cb"><div class="cw" style="height:260px"><canvas id="ch-mon-d"></canvas></div></div></div>
+  </div>`;
+  NC.bar('ch-mon-s',D.monthly.labels,[{label:'Sales',data:D.monthly.sales,color:'#7c6ff7'}]);
+  NC.bar('ch-mon-r',D.monthly.labels,[{label:'Revenue',data:D.monthly.amount,color:'#4ade80'}],{c:true});
+  NC.line('ch-wk-tr',D.weekly.labels,[{label:'Sales',data:D.weekly.sales,color:'#7c6ff7'},{label:'Rev(L)',data:D.weekly.amount.map(v=>Math.round(v/100000)),color:'#4ade80',fill:false}]);
+  NC.donut('ch-mon-d',D.monthly.labels,D.monthly.amount);
+}
+
+function manager(D){
+  const mg=D.managers,mx=mg[0]?.sales||1;
+  $('dz').innerHTML=`
+  <div class="ph"><div><h1>👔 Manager Dashboard</h1><p>L3 performance · ${mg.length} managers ranked</p></div></div>
+  <div class="kg">
+    ${kc('Managers',fN(mg.length),'👔','var(--c1)','L3 level','neu')}
+    ${kc('Top Manager',mg[0]?.name.split(' ')[0]||'—','🏆','var(--c6)',fL(mg[0]?.amount),'up')}
+    ${kc('Total Sales',fN(mg.reduce((s,m)=>s+m.sales,0)),'💰','var(--c4)','Combined','up')}
+    ${kc('Total Revenue',fL(mg.reduce((s,m)=>s+m.amount,0)),'📊','var(--c3)','All managers','up')}
+  </div>
+  <div class="g21 mb20">
+    <div class="card"><div class="ch"><div class="ct">🏆 Sales Ranking</div></div>
+      <div class="cb"><div class="cw" style="height:280px"><canvas id="ch-mg-h"></canvas></div></div></div>
+    <div class="card"><div class="ch"><div class="ct">📊 Revenue Share</div></div>
+      <div class="cb" style="display:flex;flex-direction:column;gap:10px">
+        <div class="cw" style="height:180px"><canvas id="ch-mg-d"></canvas></div>
+        <div class="dl">${mg.map((m,i)=>`<div class="dl-i"><div class="dl-d" style="background:${['#7c6ff7','#e879f9','#22d3ee','#4ade80','#fb923c','#fbbf24','#a78bfa','#34d399'][i%8]}"></div><span class="dl-l">${m.name.split(' ')[0]}</span><span class="dl-v">${fL(m.amount)}</span></div>`).join('')}</div>
+      </div></div>
+  </div>
+  <div class="card"><div class="ch"><div class="ct">📋 Manager Table</div><span class="cbdg">${mg.length} Managers</span></div>
+    <div class="cb p0"><div class="tw"><table class="dt">
+      <thead><tr><th>Rank</th><th>Manager</th><th>Team</th><th>Sales</th><th>Revenue</th><th>Avg Ticket</th><th>Prod/Head</th><th>Bar</th></tr></thead>
+      <tbody>${mg.map((m,i)=>`<tr class="${i<3?'r'+(i+1):''}">
+        <td>${rb(i)}</td><td class="tn">${m.name}</td><td>${m.hc} execs</td>
+        <td class="tv">${fN(m.sales)}</td><td class="tv">${fL(m.amount)}</td>
+        <td>${m.sales?fL(Math.round(m.amount/m.sales)):'—'}</td>
+        <td class="tv">${m.hc?fL(Math.round(m.amount/m.hc)):'—'}</td>
+        <td>${bc(m.sales,mx)}</td></tr>`).join('')}</tbody>
+    </table></div></div></div>`;
+  NC.hbar('ch-mg-h',mg.map(m=>m.name.split(' ')[0]),mg.map(m=>m.sales));
+  NC.donut('ch-mg-d',mg.map(m=>m.name.split(' ')[0]),mg.map(m=>m.amount));
+}
+
+function exec(D){
+  const ex=D.execs,mx=ex[0]?.sales||1;
+  const q=document.getElementById('esrch')?.value||'';
+  const fl=q?ex.filter(e=>[e.name,e.manager,e.location].join(' ').toLowerCase().includes(q.toLowerCase())):ex;
+  $('dz').innerHTML=`
+  <div class="ph"><div><h1>👨‍💼 Executive Rankings</h1><p>${ex.length} agents · Sales, HL, meetings</p></div></div>
+  <div class="kg">
+    ${kc('Total Execs',fN(ex.length),'👨‍💼','var(--c1)','All agents','neu')}
+    ${kc('Top Exec',ex[0]?.name.split(' ').slice(0,2).join(' ')||'—','🏆','var(--c6)',ex[0]?.sales+' sales','up')}
+    ${kc('Avg Sales',(ex.reduce((s,e)=>s+e.sales,0)/ex.length).toFixed(1),'📊','var(--c3)','Per exec','neu')}
+    ${kc('Best HL Conv',Math.max(...ex.filter(e=>e.hl>0).map(e=>e.hlConv),0)+'%','🎯','var(--c4)','Conversion','up')}
+  </div>
+  <div class="fr">
+    <input class="finp" id="esrch" placeholder="🔍 Search name, manager, location…" value="${q}" oninput="D._tab('exec')" style="min-width:260px">
+    <span style="font-size:.72rem;color:var(--tm)">Showing ${fl.length} of ${ex.length}</span>
+  </div>
+  <div class="card"><div class="ch"><div class="ct">📋 Executive Leaderboard</div><span class="cbdg">${fl.length} Records</span></div>
+    <div class="cb p0"><div class="tw"><table class="dt">
+      <thead><tr><th>Rank</th><th>Executive</th><th>Manager</th><th>Location</th><th>Sales</th><th>Revenue</th><th>HL</th><th>Conv%</th><th>Meetings</th><th>Bar</th></tr></thead>
+      <tbody>${fl.slice(0,60).map((e,i)=>`<tr class="${i<3?'r'+(i+1):''}">
+        <td>${rb(i)}</td><td class="tn">${e.name}</td><td>${e.manager||'—'}</td>
+        <td>${(e.location||'—').split(' ').slice(0,2).join(' ')}</td>
+        <td class="tv">${fN(e.sales)}</td><td class="tv">${fL(e.amount)}</td>
+        <td>${fN(e.hl)||'—'}</td>
+        <td><span class="pill ${e.hlConv>=20?'pg':e.hlConv>=12?'po':'pr'}">${e.hlConv||0}%</span></td>
+        <td>${fN(e.meetings)||'—'}</td><td>${bc(e.sales,mx)}</td></tr>`).join('')}</tbody>
+    </table></div></div></div>`;
+}
+
+function location(D){
+  const lc=D.locations,mx=lc[0]?.sales||1;
+  $('dz').innerHTML=`
+  <div class="ph"><div><h1>📍 Location Dashboard</h1><p>${lc.length} branches · Revenue & productivity</p></div></div>
+  <div class="kg">
+    ${kc('Locations',fN(lc.length),'📍','var(--c1)','Active branches','neu')}
+    ${kc('Best Branch',lc[0]?.name.split(' ').slice(0,1).join(' '),'🏆','var(--c6)',fL(lc[0]?.amount),'up')}
+    ${kc('Total Revenue',fL(lc.reduce((s,l)=>s+l.amount,0)),'💰','var(--c4)','All branches','up')}
+    ${kc('Avg Revenue',fL(Math.round(lc.reduce((s,l)=>s+l.amount,0)/lc.length)),'📊','var(--c3)','Per branch','neu')}
+  </div>
+  <div class="g2 mb20">
+    <div class="card"><div class="ch"><div class="ct">📊 Sales by Branch</div></div>
+      <div class="cb"><div class="cw" style="height:245px"><canvas id="ch-lc-s"></canvas></div></div></div>
+    <div class="card"><div class="ch"><div class="ct">💰 Revenue by Branch</div></div>
+      <div class="cb"><div class="cw" style="height:245px"><canvas id="ch-lc-r"></canvas></div></div></div>
+  </div>
+  <div class="card"><div class="ch"><div class="ct">📋 Location Performance</div></div>
+    <div class="cb p0"><div class="tw"><table class="dt">
+      <thead><tr><th>Rank</th><th>Location</th><th>Execs</th><th>Sales</th><th>Revenue</th><th>Avg Ticket</th><th>Prod/Head</th><th>Bar</th></tr></thead>
+      <tbody>${lc.map((l,i)=>`<tr class="${i<3?'r'+(i+1):''}">
+        <td>${rb(i)}</td><td class="tn">📍 ${l.name}</td><td>${l.hc}</td>
+        <td class="tv">${fN(l.sales)}</td><td class="tv">${fL(l.amount)}</td>
+        <td>${l.sales?fL(Math.round(l.amount/l.sales)):'—'}</td>
+        <td class="tv">${l.hc?fL(Math.round(l.amount/l.hc)):'—'}</td>
+        <td>${bc(l.sales,mx)}</td></tr>`).join('')}</tbody>
+    </table></div></div></div>`;
+  NC.bar('ch-lc-s',lc.map(l=>l.name.split(' ').slice(0,2).join(' ')),[{label:'Sales',data:lc.map(l=>l.sales),color:'#7c6ff7'}]);
+  NC.hbar('ch-lc-r',lc.map(l=>l.name.split(' ').slice(0,2).join(' ')),lc.map(l=>l.amount),{c:true});
+}
+
+function hl(D){
+  const he=D.hlExecs,mx=he[0]?.assigned||1;
+  $('dz').innerHTML=`
+  <div class="ph"><div><h1>🎯 HL Conversion</h1><p>Top-3 Hot Lead performance</p></div></div>
+  <div class="kg">
+    ${kc('HL Assigned','3,245','🎯','var(--c1)','Top-3 type','neu')}
+    ${kc('HL Sold','515','✅','var(--c4)','Converted','up')}
+    ${kc('Conv%','15.9%','🔥','var(--c3)','HL → Sale','up')}
+    ${kc('HL Type','Top-3','📋','var(--c6)','All assigned','neu')}
+    ${kc('Top Conv','C Varun Gouda','🏆','var(--c2)','25.2% conv','up')}
+    ${kc('Avg HL/Exec',Math.round(3245/Math.max(he.length,1)),'📊','var(--c5)','Per exec','neu')}
+  </div>
+  <div class="g2 mb20">
+    <div class="card"><div class="ch"><div class="ct">📊 Assigned vs Sold</div></div>
+      <div class="cb"><div class="cw" style="height:255px"><canvas id="ch-hl-as"></canvas></div></div></div>
+    <div class="card"><div class="ch"><div class="ct">🔥 Conversion Rate %</div></div>
+      <div class="cb"><div class="cw" style="height:255px"><canvas id="ch-hl-cv"></canvas></div></div></div>
+  </div>
+  <div class="card"><div class="ch"><div class="ct">📋 HL Performance Table</div><span class="cbdg">Top ${he.length}</span></div>
+    <div class="cb p0"><div class="tw"><table class="dt">
+      <thead><tr><th>Rank</th><th>Executive</th><th>HL Assigned</th><th>HL Sold</th><th>Conv%</th><th>Bar</th></tr></thead>
+      <tbody>${he.map((e,i)=>`<tr class="${i<3?'r'+(i+1):''}">
+        <td>${rb(i)}</td><td class="tn">${e.name}</td>
+        <td class="tv">${fN(e.assigned)}</td><td class="tv">${fN(e.sold)}</td>
+        <td><span class="pill ${e.conv>=20?'pg':e.conv>=12?'po':'pr'}">${e.conv}%</span></td>
+        <td>${bc(e.assigned,mx)}</td></tr>`).join('')}</tbody>
+    </table></div></div></div>`;
+  NC.bar('ch-hl-as',he.slice(0,10).map(e=>e.name.split(' ')[0]),
+    [{label:'Assigned',data:he.slice(0,10).map(e=>e.assigned),color:'#7c6ff7'},
+     {label:'Sold',data:he.slice(0,10).map(e=>e.sold),color:'#4ade80'}]);
+  NC.bar('ch-hl-cv',he.slice(0,10).map(e=>e.name.split(' ')[0]),
+    [{label:'Conv%',data:he.slice(0,10).map(e=>e.conv),color:'#e879f9'}]);
+}
+
+function meetings(D){
+  const mw=D.mtgWeekly;
+  $('dz').innerHTML=`
+  <div class="ph"><div><h1>🤝 Meeting Analytics</h1><p>27,423 meetings · Fresh + Followup</p></div></div>
+  <div class="kg">
+    ${kc('Total','27,423','🤝','var(--c1)','All','neu')}
+    ${kc('Fresh','17,378','🆕','var(--c4)','First contact','up')}
+    ${kc('Followup','10,045','🔄','var(--c3)','Follow-up','neu')}
+    ${kc('Fresh Ratio','63.4%','📊','var(--c2)','of all','up')}
+    ${kc('RM','Nandeesh C','👔','var(--c6)','99% coverage','up')}
+    ${kc('Avg/Week','~1,714','📅','var(--c5)','Per week','neu')}
+  </div>
+  <div class="g2 mb20">
+    <div class="card"><div class="ch"><div class="ct">📈 Weekly Meeting Trend</div><span class="cbdg">Fresh vs Followup</span></div>
+      <div class="cb"><div class="cw" style="height:240px"><canvas id="ch-mt-tr"></canvas></div></div></div>
+    <div class="card"><div class="ch"><div class="ct">📊 Meeting Type Split</div></div>
+      <div class="cb" style="display:flex;gap:14px;align-items:center">
+        <div class="cw" style="height:180px;width:180px;flex-shrink:0"><canvas id="ch-mt-d"></canvas></div>
+        <div class="dl">
+          <div class="dl-i"><div class="dl-d" style="background:#7c6ff7"></div><span class="dl-l">Fresh</span><span class="dl-v">17,378</span></div>
+          <div class="dl-i"><div class="dl-d" style="background:#e879f9"></div><span class="dl-l">Followup</span><span class="dl-v">10,045</span></div>
+        </div>
+      </div></div>
+  </div>
+  <div class="card"><div class="ch"><div class="ct">📊 Total Weekly Volume</div></div>
+    <div class="cb"><div class="cw" style="height:195px"><canvas id="ch-mt-v"></canvas></div></div></div>`;
+  NC.line('ch-mt-tr',mw.labels,[{label:'Fresh',data:mw.fresh,color:'#7c6ff7'},{label:'Followup',data:mw.followup,color:'#e879f9',fill:false}]);
+  NC.donut('ch-mt-d',['Fresh','Followup'],[17378,10045]);
+  NC.bar('ch-mt-v',mw.labels,[{label:'Total',data:mw.fresh.map((v,i)=>v+(mw.followup[i]||0)),color:'#22d3ee'}]);
+}
+
+function vintage(D){
+  const vb=D.vintage,total=Object.values(vb).reduce((s,v)=>s+v,0)||1;
+  const cols=['#7c6ff7','#22d3ee','#4ade80','#fbbf24'],lbs=Object.keys(vb),vs=Object.values(vb);
+  $('dz').innerHTML=`
+  <div class="ph"><div><h1>📅 Vintage Analysis</h1><p>HC tenure distribution</p></div></div>
+  <div class="g4 mb20">
+    ${lbs.map((k,i)=>`<div class="vb"><div class="vb-l">${k}</div>
+      <div class="vb-v" style="color:${cols[i]}">${fN(vs[i])}</div>
+      <div class="vb-s">${((vs[i]/total)*100).toFixed(1)}% of HC</div></div>`).join('')}
+  </div>
+  <div class="g2 mb20">
+    <div class="card"><div class="ch"><div class="ct">📊 Distribution</div></div>
+      <div class="cb" style="display:flex;gap:14px;align-items:center">
+        <div class="cw" style="height:215px;width:215px;flex-shrink:0"><canvas id="ch-vd"></canvas></div>
+        <div class="dl">${lbs.map((k,i)=>`<div class="dl-i"><div class="dl-d" style="background:${cols[i]}"></div><span class="dl-l">${k}</span><span class="dl-v">${fN(vs[i])} (${((vs[i]/total)*100).toFixed(1)}%)</span></div>`).join('')}</div>
+      </div></div>
+    <div class="card"><div class="ch"><div class="ct">📈 HC by Tenure</div></div>
+      <div class="cb"><div class="cw" style="height:215px"><canvas id="ch-vb"></canvas></div></div></div>
+  </div>
+  <div class="card"><div class="ch"><div class="ct">📋 Strategy Guide</div></div>
+    <div class="cb p0"><div class="tw"><table class="dt">
+      <thead><tr><th>Bucket</th><th>HC</th><th>%</th><th>Index</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td class="tn">0–60 Days</td><td class="tv">${fN(vb['0-60 D'])}</td><td>${((vb['0-60 D']/total)*100).toFixed(1)}%</td><td><span class="pill po">Ramping</span></td><td>OJT, buddy program</td></tr>
+        <tr><td class="tn">61–180 Days</td><td class="tv">${fN(vb['61-180 D'])}</td><td>${((vb['61-180 D']/total)*100).toFixed(1)}%</td><td><span class="pill pg">Growing</span></td><td>Coaching, HL assignment</td></tr>
+        <tr><td class="tn">181–270 Days</td><td class="tv">${fN(vb['181-270 D'])}</td><td>${((vb['181-270 D']/total)*100).toFixed(1)}%</td><td><span class="pill pg">High</span></td><td>Momentum, TL track</td></tr>
+        <tr><td class="tn">270+ Days</td><td class="tv">${fN(vb['270+ D'])}</td><td>${((vb['270+ D']/total)*100).toFixed(1)}%</td><td><span class="pill pv">Core</span></td><td>Retention, mentoring</td></tr>
+      </tbody>
+    </table></div></div></div>`;
+  NC.donut('ch-vd',lbs,vs);
+  NC.bar('ch-vb',lbs,[{label:'HC',data:vs,color:'#7c6ff7'}]);
+}
+
+function team(D){
+  const t=D.team;
+  $('dz').innerHTML=`
+  <div class="ph"><div><h1>🗂️ Team Mapping</h1><p>${t.length} employees from Mapping Dump</p></div></div>
+  <div class="kg">
+    ${kc('Team Size',fN(t.length),'👥','var(--c1)','Mapped','neu')}
+    ${kc('RM','Nandeesh C','👔','var(--c6)','Regional Manager','neu')}
+    ${kc('ZM','Siddhant Srivastava','🏢','var(--c3)','Zonal Manager','neu')}
+    ${kc('Branch','Bommasandra','📍','var(--c4)','Primary base','neu')}
+  </div>
+  <div class="card"><div class="ch"><div class="ct">📋 Team Directory</div><span class="cbdg">${t.length} Members</span></div>
+    <div class="cb p0"><div class="tw"><table class="dt">
+      <thead><tr><th>#</th><th>Name</th><th>Designation</th><th>Manager</th><th>Location</th><th>DOJ</th></tr></thead>
+      <tbody>${t.map((e,i)=>`<tr>
+        <td style="color:var(--tm);font-size:.72rem">${i+1}</td>
+        <td class="tn">${e.name}</td><td><span class="pill pv">${e.role}</span></td>
+        <td>${e.manager}</td><td>${e.location}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--tm)">${e.doj}</td></tr>`).join('')}</tbody>
+    </table></div></div></div>`;
+}
+
+function kpi(){
+  $('dz').innerHTML=`
+  <div class="ph"><div><h1>📐 KPI Formula Guide</h1><p>All metrics, DAX & automation</p></div></div>
+  <div class="kg">
+    ${kc('Formulas','18+','📐','var(--c1)','Documented','neu')}
+    ${kc('DAX','12','⚙️','var(--c3)','Power BI','neu')}
+    ${kc('Sources','7 CSVs','📁','var(--c4)','AMJ data','neu')}
+    ${kc('Automations','6','🤖','var(--c2)','Suggested','neu')}
+  </div>
+  <div class="g2 mb20">
+    <div class="card"><div class="ch"><div class="ct">📐 Core Formulas</div></div>
+      <div class="cb p0"><div class="tw"><table class="dt">
+        <thead><tr><th>KPI</th><th>Formula</th><th>Source</th></tr></thead>
+        <tbody>
+          <tr><td class="tn">Achievement%</td><td style="font-family:monospace;font-size:.72rem">(MTD Sales / MTD Target) × 100</td><td>Sale Dump</td></tr>
+          <tr><td class="tn">Productivity</td><td style="font-family:monospace;font-size:.72rem">Revenue / Active HC</td><td>HC + Sale</td></tr>
+          <tr><td class="tn">HL Conversion</td><td style="font-family:monospace;font-size:.72rem">(HL Sold / HL Assigned) × 100</td><td>HL Dump</td></tr>
+          <tr><td class="tn">Daily Run Rate</td><td style="font-family:monospace;font-size:.72rem">MTD Sales / Days Elapsed</td><td>Sale Dump</td></tr>
+          <tr><td class="tn">Req Run Rate</td><td style="font-family:monospace;font-size:.72rem">(Target − MTD) / Days Left</td><td>Calculated</td></tr>
+          <tr><td class="tn">Fresh%</td><td style="font-family:monospace;font-size:.72rem">(Fresh / Total Meetings) × 100</td><td>Meeting Dump</td></tr>
+          <tr><td class="tn">Avg Ticket</td><td style="font-family:monospace;font-size:.72rem">Total Revenue / Sales Count</td><td>Sale Dump</td></tr>
+        </tbody>
+      </table></div></div></div>
+    <div class="card"><div class="ch"><div class="ct">⚙️ DAX Measures</div></div>
+      <div class="cb p0"><div class="tw"><table class="dt">
+        <thead><tr><th>Measure</th><th>DAX</th></tr></thead>
+        <tbody>
+          <tr><td class="tn">MTD Sales</td><td style="font-family:monospace;font-size:.7rem">TOTALMTD(COUNT(Sales[Receipt]),Dates[Date])</td></tr>
+          <tr><td class="tn">HL Conv%</td><td style="font-family:monospace;font-size:.7rem">DIVIDE(COUNTROWS(FILTER(HL,[Sale]="Yes")),COUNTROWS(HL),0)*100</td></tr>
+          <tr><td class="tn">Productivity</td><td style="font-family:monospace;font-size:.7rem">DIVIDE([Revenue],[Active HC],0)</td></tr>
+          <tr><td class="tn">MoM Growth</td><td style="font-family:monospace;font-size:.7rem">DIVIDE([MTD]-[PMTD],[PMTD],0)</td></tr>
+          <tr><td class="tn">WTD Sales</td><td style="font-family:monospace;font-size:.7rem">TOTALWTD(COUNT(Sales[Receipt]),Dates[Date])</td></tr>
+        </tbody>
+      </table></div></div></div>
+  </div>
+  <div class="card"><div class="ch"><div class="ct">🤖 Automation Opportunities</div></div>
+    <div class="cb"><div class="ig">
+      <div class="ii"><div class="ii-ico">📧</div><div class="ii-t"><strong>Daily Email Digest</strong><span>Power Automate: CSV upload → KPIs extracted → PDF sent to Nandeesh C</span></div></div>
+      <div class="ii"><div class="ii-ico">📊</div><div class="ii-t"><strong>Auto Dashboard Refresh</strong><span>Drop CSVs → Python → GitHub push → Pages deploys in 60s</span></div></div>
+      <div class="ii"><div class="ii-ico">⚠️</div><div class="ii-t"><strong>HL Alert</strong><span>Alert TL when exec conv drops below 10% after 15 HLs</span></div></div>
+      <div class="ii"><div class="ii-ico">📱</div><div class="ii-t"><strong>WhatsApp 9AM</strong><span>Top 3 execs + achievement + HL conv% daily via WA Business API</span></div></div>
+      <div class="ii"><div class="ii-ico">🤖</div><div class="ii-t"><strong>AI Coaching</strong><span>Claude API: coaching notes per exec based on sales vs HL delta</span></div></div>
+      <div class="ii"><div class="ii-ico">🔄</div><div class="ii-t"><strong>HC Sync</strong><span>HRMS → mapping → vintage → Z-Status auto-refresh weekly</span></div></div>
+    </div></div></div>`;
+}
+
+function exp(){
+  const d=data();
+  const rows=[['Rank','Executive','Manager','Location','Sales','Revenue','HL','Conv%','Meetings']];
+  d.execs.forEach((e,i)=>rows.push([i+1,e.name,e.manager,e.location,e.sales,e.amount,e.hl,e.hlConv+'%',e.meetings]));
+  const csv=rows.map(r=>r.join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='NSD_AMJ_Report.csv';a.click();toast('CSV exported ✅','ts');}
+
+function _tab(t){TAB=t;renderTab(t);}
+
+function init(){
+  initNav();
+  try{const s=localStorage.getItem('nsd_m');if(s){M=JSON.parse(s);toast('💾 Previous session restored','ti');}}catch(e){}
+  updateTopbar(data());
+  renderTab(TAB);
+  document.getElementById('umodal')?.addEventListener('click',e=>{if(e.target.id==='umodal')hideU();});
+}
+
+return{init,exp,showU,hideU,process,_rm,_tab};
+})();
+
+document.addEventListener('DOMContentLoaded',D.init);
+</script>
+</body>
+</html>
